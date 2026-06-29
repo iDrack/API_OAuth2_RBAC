@@ -1,0 +1,20 @@
+name: secu_wip
+services:
+  db:
+    image: postgres:latest
+    container_name: secu_wip_db
+    env_file:
+      - .env
+    environment:
+      POSTGRES_DB: ${DATABASE_NAME}
+      POSTGRES_USER: ${DATABASE_USERNAME}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+    volumes:
+      - db_data:/var/lib/postgresql
+    ports:
+      - "5432:5432"
+
+volumes:
+  db_data:
+
+
