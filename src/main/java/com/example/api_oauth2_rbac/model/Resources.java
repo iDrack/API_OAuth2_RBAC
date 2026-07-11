@@ -1,0 +1,60 @@
+package com.example.api_oauth2_rbac.model;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
+
+@Entity
+@Table(name = "resources")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Resources {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "name", nullable = false, unique = true, length = 50)
+    private String name;
+
+    @Column(name = "type", nullable = false, length = 50)
+    private String type;
+
+    @Column(nullable = false)
+    private Long ownerIs;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id", insertable = false, updatable = false)
+    private User owner;
+
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt;
+
+    @Enumerated(EnumType.STRING)
+    private Visibility visibility;
+
+    @ElementCollection
+    @CollectionTable(name = "resource_shares", joinColumns = @JoinColumn(name = "resource_id"))
+    @Column(name = "shared_with_user_id")
+    private Set<String> sharedWithUsers = new HashSet<>();
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+    }
+
+    public enum Visibility {
+        PUBLIC,
+        PRIVATE,
+        PROTECTED,
+        GROUP,
+        READONLY,
+    }
+}
