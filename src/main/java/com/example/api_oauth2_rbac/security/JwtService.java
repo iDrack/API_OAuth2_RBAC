@@ -7,9 +7,13 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.Objects;
 import java.util.Set;
@@ -23,8 +27,14 @@ public class JwtService {
     @Autowired
     private IUserService userService;
 
-    private final String jwtSecret = System.getenv("JWT_SECRET");
-    private final String jwtRefreshSecret = System.getenv("JWT_REFRESH_SECRET");
+    @Value("${JWT_SECRET}")
+    private String jwtSecret;
+    @Value("${JWT_REFRESH_SECRET}")
+    private String jwtRefreshSecret;
+
+    private SecretKey getSigningKey(String secret) {
+        return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+    }
 
     public String generateAccessToken(User user) {
         long expirationTime = 60 * 60 * 1000; // 1 hour in milliseconds
@@ -32,12 +42,12 @@ public class JwtService {
         Date expiryDate = new Date(now.getTime() + expirationTime);
 
         return Jwts.builder()
-                .setSubject(user.getName())
+                .subject(user.getName())
                 .claim("roles", user.getRoles())
-                .setAudience("access")
-                .setIssuedAt(now)
-                .setExpiration(expiryDate)
-                .signWith(SignatureAlgorithm.HS512, jwtSecret)
+                .audience().add("access").and()
+                .issuedAt(now)
+                .expiration(expiryDate)
+                .signWith(getSigningKey(jwtSecret), Jwts.SIG.HS512)
                 .compact();
     }
 
@@ -47,29 +57,29 @@ public class JwtService {
         Date expiryDate = new Date(now.getTime() + expirationTime);
 
         return Jwts.builder()
-                .setSubject(user.getName())
-                .setAudience("refresh")
-                .setIssuedAt(now)
-                .setExpiration(expiryDate)
-                .signWith(SignatureAlgorithm.HS512, jwtRefreshSecret)
+                .subject(user.getName())
+                .audience().add("refresh").and()
+                .issuedAt(now)
+                .expiration(expiryDate)
+                .signWith(getSigningKey(jwtRefreshSecret), Jwts.SIG.HS512)
                 .compact();
     }
 
     public String extractUsername(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(jwtSecret)
+        return Jwts.parser()
+                .verifyWith(getSigningKey(jwtSecret))
                 .build()
-                .parseClaimsJws(token)
-                .getBody()
+                .parseSignedClaims(token)
+                .getPayload()
                 .getSubject();
     }
 
     public Claims extractClaims(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(jwtSecret)
+        return Jwts.parser()
+                .verifyWith(getSigningKey(jwtSecret))
                 .build()
-                .parseClaimsJws(token)
-                .getBody();
+                .parseSignedClaims(token)
+                .getPayload();
     }
 
     public Set<Role> extractRoles(String token) {
@@ -79,7 +89,12 @@ public class JwtService {
 
     public boolean isValidAccessToken(String token, User user) {
         try {
-            String audience = Jwts.parserBuilder().setSigningKey(jwtSecret).build().parseClaimsJws(token).getBody().getAudience();
+            String audience = Jwts.parser()
+                    .verifyWith(getSigningKey(jwtSecret))
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload()
+                    .getAudience().stream().findFirst().orElse(null);
 
             String username = extractUsername(token);
             return Objects.equals(audience, "access") && Objects.equals(username, user.getName());
@@ -90,7 +105,12 @@ public class JwtService {
 
     public boolean isValidRefreshToken(String token, User user) {
         try {
-            String audience = Jwts.parserBuilder().setSigningKey(jwtRefreshSecret).build().parseClaimsJws(token).getBody().getAudience();
+            String audience = Jwts.parser()
+                    .verifyWith(getSigningKey(jwtRefreshSecret))
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload()
+                    .getAudience().stream().findFirst().orElse(null);
 
             return Objects.equals(audience, "refresh");
         } catch (JwtException e) {
@@ -100,11 +120,11 @@ public class JwtService {
 
     public boolean isTokenExpired(String token) {
         try {
-            Date expiration = Jwts.parserBuilder()
-                    .setSigningKey(jwtSecret)
+            Date expiration = Jwts.parser()
+                    .verifyWith(getSigningKey(jwtSecret))
                     .build()
-                    .parseClaimsJws(token)
-                    .getBody()
+                    .parseSignedClaims(token)
+                    .getPayload()
                     .getExpiration();
             return expiration.before(new Date());
         } catch (JwtException e) {

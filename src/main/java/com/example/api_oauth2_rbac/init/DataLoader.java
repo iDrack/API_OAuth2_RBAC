@@ -7,11 +7,13 @@ import com.example.api_oauth2_rbac.repository.PermissionRepository;
 import com.example.api_oauth2_rbac.repository.RoleRepository;
 import com.example.api_oauth2_rbac.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -23,6 +25,9 @@ public class DataLoader implements CommandLineRunner {
     private final PermissionRepository permissionRepository;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+
+    @Value("${ADMIN_PASS}")
+    private String adminPass;
 
     @Override
     public void run(String... args) throws Exception {
@@ -57,7 +62,7 @@ public class DataLoader implements CommandLineRunner {
             Role adminRole = Role.builder()
                     .name("ROLE_ADMIN")
                     .description("Administrateur")
-                    .permissions((Set<Permission>) permissionRepository.findAll())
+                    .permissions(new HashSet<>(permissionRepository.findAll()))
                     .build();
             roleRepository.save(adminRole);
         }
@@ -67,7 +72,7 @@ public class DataLoader implements CommandLineRunner {
             User admin = User.builder()
                     .name("admin")
                     .email("admin@example.com")
-                    .password(passwordEncoder.encode(System.getenv("ADMIN_PASS")))
+                    .password(passwordEncoder.encode(adminPass))
                     .firstName("Admin")
                     .lastName("System")
                     .active(true)
