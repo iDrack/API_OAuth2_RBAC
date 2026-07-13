@@ -122,4 +122,14 @@ public class UserService implements IUserService {
         }
         return null;
     }
+
+    @Override
+    public User disableAccount(String name) {
+        User user = getByName(name);
+        if(user == null) {
+            throw new IllegalArgumentException("User not found");
+        }
+        user.setActive(false);
+        return userRepository.save(user);
+    }
 }

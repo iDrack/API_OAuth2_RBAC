@@ -15,9 +15,12 @@ public interface IUserService {
     public User setAdmin(UserUpdate userUpdateDto);
 
     public User setRole(UserUpdate userUpdateDto, Set<Role> roles);
+
     public User addRole(UserUpdate userUpdateDto, Role role);
 
     public boolean deleteByName(String name);
 
     User update(UserUpdate userUpdateDto) throws IllegalArgumentException;
+
+    User disableAccount(String name);
 }
