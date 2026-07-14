@@ -2,11 +2,11 @@ package com.example.api_oauth2_rbac.security;
 
 import com.example.api_oauth2_rbac.model.Role;
 import com.example.api_oauth2_rbac.model.User;
+import com.example.api_oauth2_rbac.repository.RoleRepository;
 import com.example.api_oauth2_rbac.service.interfaces.IUserService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -43,7 +44,7 @@ public class JwtService {
 
         return Jwts.builder()
                 .subject(user.getName())
-                .claim("roles", user.getRoles())
+                .claim("roles", user.getRoles().stream().map(Role::getName).toList())
                 .audience().add("access").and()
                 .issuedAt(now)
                 .expiration(expiryDate)
@@ -82,9 +83,12 @@ public class JwtService {
                 .getPayload();
     }
 
-    public Set<Role> extractRoles(String token) {
-        Set<Role> roles = extractClaims(token).get("roles", Set.class);
-        return roles;
+    public List<String> extractRoles(String token) {
+        return extractClaims(token).get("roles", List.class);
+    }
+
+    public User extractUser(String token) throws IllegalArgumentException {
+        return userService.getByName(extractUsername(token));
     }
 
     public boolean isValidAccessToken(String token, User user) {

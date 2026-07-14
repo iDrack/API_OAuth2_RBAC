@@ -1,6 +1,7 @@
 package com.example.api_oauth2_rbac.service.interfaces;
 
 import com.example.api_oauth2_rbac.dto.user.UserCreate;
+import com.example.api_oauth2_rbac.dto.user.UserLogin;
 import com.example.api_oauth2_rbac.dto.user.UserUpdate;
 import com.example.api_oauth2_rbac.model.Role;
 import com.example.api_oauth2_rbac.model.User;
@@ -9,6 +10,8 @@ import java.util.Set;
 
 public interface IUserService {
     public User create(UserCreate userCreateDto) throws IllegalArgumentException;
+
+    public User login(UserLogin userLoginDto)throws IllegalArgumentException;
 
     public User getByName(String name);
 

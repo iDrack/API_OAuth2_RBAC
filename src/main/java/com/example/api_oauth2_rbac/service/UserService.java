@@ -1,6 +1,7 @@
 package com.example.api_oauth2_rbac.service;
 
 import com.example.api_oauth2_rbac.dto.user.UserCreate;
+import com.example.api_oauth2_rbac.dto.user.UserLogin;
 import com.example.api_oauth2_rbac.dto.user.UserUpdate;
 import com.example.api_oauth2_rbac.model.Role;
 import com.example.api_oauth2_rbac.model.User;
@@ -26,10 +27,17 @@ public class UserService implements IUserService {
 
     @Override
     public User create(UserCreate userCreateDto) throws IllegalArgumentException {
+        if(userRepository.existsByEmail(userCreateDto.getEmail())) {
+            throw new IllegalArgumentException("Email already in use");
+        }
+        if (userRepository.existsUserByName(userCreateDto.getName())) {
+            throw new IllegalArgumentException("Username already in use");
+        }
         User newUser = User.builder()
                 .name(userCreateDto.getName())
                 .email(userCreateDto.getEmail())
                 .password(passwordEncoder.encode(userCreateDto.getPassword()))
+                .active(true)
                 .build();
         newUser.setRoles(roleRepository.findRoleByName("ROLE_USER").map(Set::of).orElseThrow(() -> new IllegalArgumentException("Default role not found")));
 
@@ -42,6 +50,19 @@ public class UserService implements IUserService {
 
         newUser = userRepository.save(newUser);
         return newUser;
+    }
+
+    @Override
+    public User login(UserLogin userLoginDto) throws IllegalArgumentException {
+        String name = userLoginDto.getName();
+        if(name.isEmpty() || userLoginDto.getPassword().isEmpty()) {
+            throw new IllegalArgumentException("Name and password are required");
+        }
+        User user = getByName(name);
+        if (user == null || !passwordEncoder.matches(userLoginDto.getPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("Invalid username or password");
+        }
+        return user;
     }
 
     @Override
