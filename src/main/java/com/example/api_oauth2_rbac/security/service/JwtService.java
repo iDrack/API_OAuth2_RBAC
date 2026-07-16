@@ -23,9 +23,6 @@ import java.util.Objects;
 @Service
 public class JwtService {
 
-    //TODO: Add permissions to jwt + extract
-    //TODO: Add  buildAuthentication(String token) =>   transforme le JWT en Authentication Spring Security
-    //TODO: Add  getAuthorities(String token) =>  mappe rôles + permissions vers GrantedAuthority
     @Autowired
     private IUserService userService;
 

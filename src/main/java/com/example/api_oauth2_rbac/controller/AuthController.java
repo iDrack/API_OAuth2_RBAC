@@ -2,15 +2,16 @@ package com.example.api_oauth2_rbac.controller;
 
 import com.example.api_oauth2_rbac.dto.user.UserCreate;
 import com.example.api_oauth2_rbac.dto.user.UserLogin;
+import com.example.api_oauth2_rbac.dto.user.UserRead;
+import com.example.api_oauth2_rbac.model.User;
 import com.example.api_oauth2_rbac.security.service.JwtService;
 import com.example.api_oauth2_rbac.service.UserService;
 import com.example.api_oauth2_rbac.utils.DtoTools;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -59,4 +60,9 @@ public class AuthController {
         }
     }
 
+    @GetMapping(value = "/profile", produces = "application/json")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<UserRead> getCurrentUser(@AuthenticationPrincipal User currentUser) {
+        return ResponseEntity.ok(dtoTools.convertToDto(currentUser, UserRead.class));
+    }
 }
