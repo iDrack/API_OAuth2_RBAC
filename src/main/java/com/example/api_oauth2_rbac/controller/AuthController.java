@@ -2,8 +2,7 @@ package com.example.api_oauth2_rbac.controller;
 
 import com.example.api_oauth2_rbac.dto.user.UserCreate;
 import com.example.api_oauth2_rbac.dto.user.UserLogin;
-import com.example.api_oauth2_rbac.model.User;
-import com.example.api_oauth2_rbac.security.JwtService;
+import com.example.api_oauth2_rbac.security.service.JwtService;
 import com.example.api_oauth2_rbac.service.UserService;
 import com.example.api_oauth2_rbac.utils.DtoTools;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +52,7 @@ public class AuthController {
                 return ResponseEntity.status(400).body(Map.of("error", "Email is invalid"));
             }
             userService.create(userCreateDto);
-            UserLogin newUser = new UserLogin(userCreateDto.getName(), userCreateDto.getPassword());
+            UserLogin newUser = new UserLogin(userCreateDto.getUsername(), userCreateDto.getPassword());
             return login(newUser);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(400).body(Map.of("error", e.getMessage()));

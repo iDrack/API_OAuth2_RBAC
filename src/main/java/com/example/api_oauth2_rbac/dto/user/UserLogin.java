@@ -6,11 +6,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserLogin {
-    private String name;
+    private String username;
     private String password;
 
-    public String getName() {
-        return name.trim();
+    public String getUsername() {
+        return username.trim();
     }
 
     public String getPassword() {

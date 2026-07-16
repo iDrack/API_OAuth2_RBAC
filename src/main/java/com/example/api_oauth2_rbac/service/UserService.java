@@ -30,11 +30,11 @@ public class UserService implements IUserService {
         if(userRepository.existsByEmail(userCreateDto.getEmail())) {
             throw new IllegalArgumentException("Email already in use");
         }
-        if (userRepository.existsUserByName(userCreateDto.getName())) {
+        if (userRepository.existsUserByUsername(userCreateDto.getUsername())) {
             throw new IllegalArgumentException("Username already in use");
         }
         User newUser = User.builder()
-                .name(userCreateDto.getName())
+                .username(userCreateDto.getUsername())
                 .email(userCreateDto.getEmail())
                 .password(passwordEncoder.encode(userCreateDto.getPassword()))
                 .active(true)
@@ -54,11 +54,11 @@ public class UserService implements IUserService {
 
     @Override
     public User login(UserLogin userLoginDto) throws IllegalArgumentException {
-        String name = userLoginDto.getName();
+        String name = userLoginDto.getUsername();
         if(name.isEmpty() || userLoginDto.getPassword().isEmpty()) {
             throw new IllegalArgumentException("Name and password are required");
         }
-        User user = getByName(name);
+        User user = getByUsername(name);
         if (user == null || !passwordEncoder.matches(userLoginDto.getPassword(), user.getPassword())) {
             throw new IllegalArgumentException("Invalid username or password");
         }
@@ -66,17 +66,17 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public User getByName(String name) {
-        Optional<User> userFound = userRepository.findUserByName(name);
+    public User getByUsername(String username) {
+        Optional<User> userFound = userRepository.findUserByUsername(username);
         return userFound.orElse(null);
     }
 
     @Override
     public User setAdmin(UserUpdate userUpdateDto) {
-        if (userUpdateDto.getName() == null) {
+        if (userUpdateDto.getUsername() == null) {
             throw new IllegalArgumentException("User name is required");
         }
-        User user = getByName(userUpdateDto.getName());
+        User user = getByUsername(userUpdateDto.getUsername());
         if(user == null) {
             throw new IllegalArgumentException("User not found");
         }
@@ -86,10 +86,10 @@ public class UserService implements IUserService {
 
     @Override
     public User setRole(UserUpdate userUpdateDto, Set<Role> roles) {
-        if (userUpdateDto.getName() == null) {
+        if (userUpdateDto.getUsername() == null) {
             throw new IllegalArgumentException("User name is required");
         }
-        User user = getByName(userUpdateDto.getName());
+        User user = getByUsername(userUpdateDto.getUsername());
         if(user == null) {
             throw new IllegalArgumentException("User not found");
         }
@@ -99,10 +99,10 @@ public class UserService implements IUserService {
 
     @Override
     public User addRole(UserUpdate userUpdateDto, Role role) {
-        if (userUpdateDto.getName() == null) {
+        if (userUpdateDto.getUsername() == null) {
             throw new IllegalArgumentException("User name is required");
         }
-        User user = getByName(userUpdateDto.getName());
+        User user = getByUsername(userUpdateDto.getUsername());
         if(user == null) {
             throw new IllegalArgumentException("User not found");
         }
@@ -111,8 +111,8 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public boolean deleteByName(String name) {
-        User user = getByName(name);
+    public boolean deleteByUsername(String username) {
+        User user = getByUsername(username);
         if(user != null) {
             userRepository.delete(user);
             return true;
@@ -122,10 +122,10 @@ public class UserService implements IUserService {
 
     @Override
     public User update(UserUpdate userUpdateDto) throws IllegalArgumentException {
-        if (userUpdateDto.getName() == null) {
+        if (userUpdateDto.getUsername() == null) {
             throw new IllegalArgumentException("User name is required");
         }
-        User user = getByName(userUpdateDto.getName());
+        User user = getByUsername(userUpdateDto.getUsername());
         if(user == null) {
             throw new IllegalArgumentException("User not found");
         }
@@ -145,8 +145,8 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public User disableAccount(String name) {
-        User user = getByName(name);
+    public User disableAccount(String username) {
+        User user = getByUsername(username);
         if(user == null) {
             throw new IllegalArgumentException("User not found");
         }

@@ -9,14 +9,14 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserRead {
-    private String name;
+    private String username;
     private String firstName;
     private String lastName;
     private String email;
     private Set<Role> roles;
 
-    public String getName() {
-        return name.trim();
+    public String getUsername() {
+        return username.trim();
     }
 
     public String getFirstName() {

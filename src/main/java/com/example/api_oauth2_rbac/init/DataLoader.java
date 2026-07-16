@@ -68,9 +68,9 @@ public class DataLoader implements CommandLineRunner {
         }
 
         // Créer un utilisateur admin par défaut
-        if (userRepository.findUserByName("admin").isEmpty()) {
+        if (userRepository.findUserByUsername("admin").isEmpty()) {
             User admin = User.builder()
-                    .name("admin")
+                    .username("admin")
                     .email("admin@example.com")
                     .password(passwordEncoder.encode(adminPass))
                     .firstName("Admin")

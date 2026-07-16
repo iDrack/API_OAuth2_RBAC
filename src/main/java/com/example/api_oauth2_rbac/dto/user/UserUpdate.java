@@ -7,15 +7,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserUpdate {
-    private String name;
+    private String username;
     private String firstName;
     private String lastName;
     private String email;
     private String password;
     private String newPassword;
 
-    public String getName() {
-        return name.trim();
+    public String getUsername() {
+        return username.trim();
     }
 
     public String getFirstName() {

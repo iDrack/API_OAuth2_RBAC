@@ -13,7 +13,7 @@ public interface IUserService {
 
     public User login(UserLogin userLoginDto)throws IllegalArgumentException;
 
-    public User getByName(String name);
+    public User getByUsername(String username);
 
     public User setAdmin(UserUpdate userUpdateDto);
 
@@ -21,9 +21,9 @@ public interface IUserService {
 
     public User addRole(UserUpdate userUpdateDto, Role role);
 
-    public boolean deleteByName(String name);
+    public boolean deleteByUsername(String username);
 
     User update(UserUpdate userUpdateDto) throws IllegalArgumentException;
 
-    User disableAccount(String name);
+    User disableAccount(String username);
 }

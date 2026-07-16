@@ -1,6 +1,6 @@
 package com.example.api_oauth2_rbac.controller;
 
-import com.example.api_oauth2_rbac.security.JwtService;
+import com.example.api_oauth2_rbac.security.service.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

@@ -6,14 +6,14 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserCreate {
-    private String name;
+    private String username;
     private String firstName;
     private String lastName;
     private String email;
     private String password;
 
-    public String getName() {
-        return name.trim();
+    public String getUsername() {
+        return username.trim();
     }
 
     public String getFirstName() {

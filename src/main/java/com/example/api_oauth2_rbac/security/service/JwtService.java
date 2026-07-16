@@ -1,8 +1,7 @@
-package com.example.api_oauth2_rbac.security;
+package com.example.api_oauth2_rbac.security.service;
 
 import com.example.api_oauth2_rbac.model.Role;
 import com.example.api_oauth2_rbac.model.User;
-import com.example.api_oauth2_rbac.repository.RoleRepository;
 import com.example.api_oauth2_rbac.service.interfaces.IUserService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
@@ -10,6 +9,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
@@ -17,7 +17,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 @Service
 public class JwtService {
@@ -43,7 +42,7 @@ public class JwtService {
         Date expiryDate = new Date(now.getTime() + expirationTime);
 
         return Jwts.builder()
-                .subject(user.getName())
+                .subject(user.getUsername())
                 .claim("roles", user.getRoles().stream().map(Role::getName).toList())
                 .audience().add("access").and()
                 .issuedAt(now)
@@ -58,7 +57,7 @@ public class JwtService {
         Date expiryDate = new Date(now.getTime() + expirationTime);
 
         return Jwts.builder()
-                .subject(user.getName())
+                .subject(user.getUsername())
                 .audience().add("refresh").and()
                 .issuedAt(now)
                 .expiration(expiryDate)
@@ -88,10 +87,10 @@ public class JwtService {
     }
 
     public User extractUser(String token) throws IllegalArgumentException {
-        return userService.getByName(extractUsername(token));
+        return userService.getByUsername(extractUsername(token));
     }
 
-    public boolean isValidAccessToken(String token, User user) {
+    public boolean isValidAccessToken(String token, UserDetails user) {
         try {
             String audience = Jwts.parser()
                     .verifyWith(getSigningKey(jwtSecret))
@@ -101,13 +100,13 @@ public class JwtService {
                     .getAudience().stream().findFirst().orElse(null);
 
             String username = extractUsername(token);
-            return Objects.equals(audience, "access") && Objects.equals(username, user.getName());
+            return Objects.equals(audience, "access") && Objects.equals(username, user.getUsername());
         } catch (JwtException e) {
             return false;
         }
     }
 
-    public boolean isValidRefreshToken(String token, User user) {
+    public boolean isValidRefreshToken(String token, UserDetails user) {
         try {
             String audience = Jwts.parser()
                     .verifyWith(getSigningKey(jwtRefreshSecret))
