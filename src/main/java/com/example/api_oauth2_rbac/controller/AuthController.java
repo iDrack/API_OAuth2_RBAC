@@ -2,15 +2,11 @@ package com.example.api_oauth2_rbac.controller;
 
 import com.example.api_oauth2_rbac.dto.user.UserCreate;
 import com.example.api_oauth2_rbac.dto.user.UserLogin;
-import com.example.api_oauth2_rbac.dto.user.UserRead;
-import com.example.api_oauth2_rbac.model.User;
 import com.example.api_oauth2_rbac.security.service.JwtService;
-import com.example.api_oauth2_rbac.service.UserService;
+import com.example.api_oauth2_rbac.service.interfaces.IUserService;
 import com.example.api_oauth2_rbac.utils.DtoTools;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -21,11 +17,9 @@ import java.util.regex.Pattern;
 @RequestMapping("/api/auth")
 public class AuthController {
     @Autowired
-    private UserService userService;
+    private IUserService userService;
     @Autowired
     private JwtService jwtService;
-    @Autowired
-    private DtoTools dtoTools;
 
     private final Pattern passwordRegex = Pattern.compile("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#&()–[{}]:;',?/*~$^+=<>]).{8,20}$");
     private final Pattern emailRegex = Pattern.compile("^(.+)@(\\S+)$");
@@ -58,11 +52,5 @@ public class AuthController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(400).body(Map.of("error", e.getMessage()));
         }
-    }
-
-    @GetMapping(value = "/profile", produces = "application/json")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<UserRead> getCurrentUser(@AuthenticationPrincipal User currentUser) {
-        return ResponseEntity.ok(dtoTools.convertToDto(currentUser, UserRead.class));
     }
 }

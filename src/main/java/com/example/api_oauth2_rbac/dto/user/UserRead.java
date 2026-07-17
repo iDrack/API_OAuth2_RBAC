@@ -2,17 +2,21 @@ package com.example.api_oauth2_rbac.dto.user;
 
 import com.example.api_oauth2_rbac.model.Role;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.Set;
 
 @AllArgsConstructor
 @NoArgsConstructor
+@Setter
 public class UserRead {
     private String username;
     private String firstName;
     private String lastName;
     private String email;
+    @Getter
     private Set<Role> roles;
 
     public String getUsername() {
@@ -31,7 +35,4 @@ public class UserRead {
         return email.trim();
     }
 
-    public Set<Role> getRoles() {
-        return roles;
-    }
 }

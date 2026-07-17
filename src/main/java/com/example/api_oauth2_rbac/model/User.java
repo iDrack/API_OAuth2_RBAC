@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
-@Table(name = "users", uniqueConstraints = @UniqueConstraint(columnNames = "name"))
+@Table(name = "users", uniqueConstraints = @UniqueConstraint(columnNames = "username"))
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -96,5 +96,20 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return UserDetails.super.isEnabled();
+    }
+
+    @Override
+    public String toString() {
+        List<String> rolesString = getRoles().stream().map(Role::getName).toList();
+        return "User{" +
+                "username='" + username + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", email='" + email + '\'' +
+                ", active=" + active +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                ", roles=" + rolesString +
+                '}';
     }
 }

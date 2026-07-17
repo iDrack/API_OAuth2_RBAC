@@ -2,12 +2,11 @@ package com.example.api_oauth2_rbac.security.service;
 
 import com.example.api_oauth2_rbac.model.Role;
 import com.example.api_oauth2_rbac.model.User;
-import com.example.api_oauth2_rbac.service.interfaces.IUserService;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,9 +21,6 @@ import java.util.Objects;
 
 @Service
 public class JwtService {
-
-    @Autowired
-    private IUserService userService;
 
     @Value("${JWT_SECRET}")
     private String jwtSecret;
@@ -89,10 +85,6 @@ public class JwtService {
 
     public List<String> extractRoles(String token) {
         return extractClaims(token).get("roles", List.class);
-    }
-
-    public User extractUser(String token) throws IllegalArgumentException {
-        return userService.getByUsername(extractUsername(token));
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
