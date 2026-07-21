@@ -1,7 +1,6 @@
 package com.example.api_oauth2_rbac.security.service;
 
 import com.example.api_oauth2_rbac.repository.UserRepository;
-import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

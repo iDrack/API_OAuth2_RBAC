@@ -74,7 +74,7 @@ public class User implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return getRoles().stream()
                 .flatMap(role -> role.getPermissions().stream()
-                        .map(p -> new SimpleGrantedAuthority("PERMISSION_" + p.getCode()))
+                        .map(p -> new SimpleGrantedAuthority("PERMISSION_" + p))
                 ).toList();
     }
 

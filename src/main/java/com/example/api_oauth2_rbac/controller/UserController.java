@@ -1,6 +1,7 @@
 package com.example.api_oauth2_rbac.controller;
 
 import com.example.api_oauth2_rbac.dto.user.UserRead;
+import com.example.api_oauth2_rbac.model.Permission;
 import com.example.api_oauth2_rbac.model.User;
 import com.example.api_oauth2_rbac.security.annotation.RequirePermission;
 import com.example.api_oauth2_rbac.service.interfaces.IUserService;
@@ -11,6 +12,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -24,7 +26,7 @@ public class UserController {
 
     @DeleteMapping(value = "/{username}")
     @PreAuthorize("isAuthenticated()")
-    @RequirePermission("USER_DELETE")
+    @RequirePermission(Permission.USER_DELETE)
     public ResponseEntity<Map<String, String>> deleteUser(@PathVariable String username) {
         if (userService.deleteByUsername(username)) {
             return ResponseEntity.ok(Map.of(
@@ -41,5 +43,16 @@ public class UserController {
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<UserRead> getCurrentUser(@AuthenticationPrincipal User currentUser) {
         return ResponseEntity.ok(dtoTools.convertToDto(currentUser, UserRead.class));
+    }
+
+    @GetMapping(value = "/", produces = "application/json")
+    @PreAuthorize("isAuthenticated()")
+    @RequirePermission(Permission.USER_READ)
+    public ResponseEntity<List<UserRead>> getAllUSers() {
+        return ResponseEntity.ok(userService.getAllUsers()
+                .stream()
+                .map(user ->
+                        dtoTools.convertToDto(user, UserRead.class))
+                .toList());
     }
 }

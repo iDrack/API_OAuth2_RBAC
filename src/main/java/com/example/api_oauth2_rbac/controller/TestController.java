@@ -1,5 +1,6 @@
 package com.example.api_oauth2_rbac.controller;
 
+import com.example.api_oauth2_rbac.model.Permission;
 import com.example.api_oauth2_rbac.security.annotation.RequirePermission;
 import com.example.api_oauth2_rbac.security.service.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,7 @@ public class TestController {
 
     @GetMapping("/admin")
     @PreAuthorize("hasRole('ADMIN')")
-    @RequirePermission("ADMIN_ACCESS")
+    @RequirePermission(Permission.ADMIN_ACCESS)
     public ResponseEntity<Map<String, String>> adminOnlyEndpoint(
             @RequestHeader(value = "Authorization", required = true) String authToken
     ) {
